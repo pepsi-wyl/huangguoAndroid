@@ -1,0 +1,27 @@
+.gradle/
+.idea/
+.run/
+local.properties
+**/build/
+.DS_Store
+
+# Android/Gradle generated files
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local IDE and OS metadata
+*.iml
+*.log
+
+# Local release packages
+/dist/
+__pycache__/
+
+# Project-local generated debug signing keys
+**/.generated/
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.key

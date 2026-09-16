@@ -1,0 +1,47 @@
+name: Package version release
+
+on:
+  push:
+    tags:
+      - 'hg*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test packaging rules
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
+      - name: Package selected version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/package_release.py "$RELEASE_TAG" --ref "$GITHUB_SHA"
+      - name: Create draft release with downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="dist/$RELEASE_TAG"
+          # Do not overwrite an existing release (including a published one).
+          gh release create "$RELEASE_TAG" \
+            --verify-tag --draft \
+            --title "黄果 Android ${RELEASE_TAG#hg}" \
+            --notes-file "$release_dir/release-notes.md" \
+            "$release_dir"/*.apk \
+            "$release_dir"/*.zip \
+            "$release_dir/SHA256SUMS.txt"

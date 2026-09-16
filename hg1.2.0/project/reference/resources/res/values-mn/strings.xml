@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="call_notification_answer_action">Хариулах</string>
+    <string name="call_notification_answer_video_action">Видео</string>
+    <string name="call_notification_decline_action">Татгалзах</string>
+    <string name="call_notification_hang_up_action">Таслах</string>
+    <string name="call_notification_incoming_text">Ирсэн дуудлага</string>
+    <string name="call_notification_ongoing_text">Дуудлага хийгдэж байна</string>
+    <string name="call_notification_screening_text">Ирсэн дуудлагыг харуулж байна</string>
+    <string name="copy_toast_msg">Холбоосыг түр санах ойд хуулсан</string>
+    <string name="exo_download_completed">Татаж дууссан</string>
+    <string name="exo_download_description">Татах</string>
+    <string name="exo_download_downloading">Татаж байна</string>
+    <string name="exo_download_failed">Татаж чадсангүй</string>
+    <string name="exo_download_notification_channel_name">Татaлт</string>
+    <string name="exo_download_paused">Таталтуудыг түр зогсоосон</string>
+    <string name="exo_download_paused_for_network">Таталтууд сүлжээг хүлээж байна</string>
+    <string name="exo_download_paused_for_wifi">Таталтууд Wi-Fi-г хүлээж байна</string>
+    <string name="exo_download_removing">Татаж авсан файлыг хасаж байна</string>
+    <string name="fallback_menu_item_copy_link">Холбоосыг хуулах</string>
+    <string name="fallback_menu_item_open_in_browser">Хөтчид нээх</string>
+    <string name="fallback_menu_item_share_link">Холбоосыг хуваалцах</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+</resources>

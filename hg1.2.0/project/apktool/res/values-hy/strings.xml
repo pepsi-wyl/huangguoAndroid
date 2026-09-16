@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="call_notification_answer_action">Պատասխանել</string>
+    <string name="call_notification_answer_video_action">Տեսազանգ</string>
+    <string name="call_notification_decline_action">Մերժել</string>
+    <string name="call_notification_hang_up_action">Ավարտել</string>
+    <string name="call_notification_incoming_text">Մուտքային զանգ</string>
+    <string name="call_notification_ongoing_text">Ընթացիկ զանգ</string>
+    <string name="call_notification_screening_text">Մուտքային զանգի զտում</string>
+    <string name="copy_toast_msg">Հղումը պատճենվեց սեղմատախտակին</string>
+    <string name="exo_download_completed">Ներբեռնումն ավարտվեց</string>
+    <string name="exo_download_description">Ներբեռնել</string>
+    <string name="exo_download_downloading">Ներբեռնում</string>
+    <string name="exo_download_failed">Չհաջողվեց ներբեռնել</string>
+    <string name="exo_download_notification_channel_name">Ներբեռնումներ</string>
+    <string name="exo_download_paused">Ներբեռնումները դադարեցված են</string>
+    <string name="exo_download_paused_for_network">Ցանցի որոնում</string>
+    <string name="exo_download_paused_for_wifi">Wi-Fi ցանցի որոնում</string>
+    <string name="exo_download_removing">Ներբեռնումները հեռացվում են</string>
+    <string name="fallback_menu_item_copy_link">Պատճենել հղումը</string>
+    <string name="fallback_menu_item_open_in_browser">Բացել դիտարկիչում</string>
+    <string name="fallback_menu_item_share_link">Կիսվել հղումով</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+</resources>
