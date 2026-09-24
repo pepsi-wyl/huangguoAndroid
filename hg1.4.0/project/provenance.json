@@ -1,0 +1,23 @@
+{
+  "versionName": "1.4.0",
+  "versionCode": 140,
+  "originalApk": "hgdj_1.4.0_260923_3.apk",
+  "originalPackage": "com.njggc.yjusza",
+  "debugPackage": "com.njggc.yjusza.debug",
+  "originalSha256": "6399ce9997b68807eb52403f4d79c35c371ac225234080704a4c31eea6e85877",
+  "tools": {
+    "apktool": "2.12.1",
+    "jadx": "1.5.3",
+    "gradle": "8.14.3",
+    "androidGradlePlugin": "8.9.3",
+    "buildTools": "36.0.0"
+  },
+  "jadxReportedErrors": 7,
+  "referenceFilesWithDecompilationErrors": [
+    "reference/sources/androidx/datastore/core/DataMigrationInitializer.java",
+    "reference/sources/androidx/datastore/core/SimpleActor.java",
+    "reference/sources/androidx/media3/exoplayer/hls/HlsSampleStreamWrapper.java",
+    "reference/sources/kotlinx/coroutines/flow/FlowKt__DelayKt.java",
+    "reference/sources/kotlinx/coroutines/flow/FlowKt__ErrorsKt.java"
+  ]
+}

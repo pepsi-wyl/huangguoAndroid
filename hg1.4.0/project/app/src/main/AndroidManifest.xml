@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AS 启动配置使用的索引清单；实际打包清单在 apktool/AndroidManifest.xml。 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:label="黄果短剧 Debug" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity android:name="com.org.aksm.MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

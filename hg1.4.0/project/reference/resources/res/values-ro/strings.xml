@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="call_notification_answer_action">Răspunde</string>
+    <string name="call_notification_answer_video_action">Video</string>
+    <string name="call_notification_decline_action">Respinge</string>
+    <string name="call_notification_hang_up_action">Închide</string>
+    <string name="call_notification_incoming_text">Apel primit</string>
+    <string name="call_notification_ongoing_text">Apel în desfășurare</string>
+    <string name="call_notification_screening_text">Se filtrează un apel primit</string>
+    <string name="copy_toast_msg">Linkul a fost copiat în clipboard</string>
+    <string name="exo_download_completed">Descărcarea a fost finalizată</string>
+    <string name="exo_download_description">Descarcă</string>
+    <string name="exo_download_downloading">Se descarcă</string>
+    <string name="exo_download_failed">Descărcarea nu a reușit</string>
+    <string name="exo_download_notification_channel_name">Descărcări</string>
+    <string name="exo_download_paused">Descărcările au fost întrerupte</string>
+    <string name="exo_download_paused_for_network">Descărcările așteaptă rețeaua</string>
+    <string name="exo_download_paused_for_wifi">Descărcările așteaptă rețeaua Wi-Fi</string>
+    <string name="exo_download_removing">Se elimină descărcările</string>
+    <string name="fallback_menu_item_copy_link">Copiază linkul</string>
+    <string name="fallback_menu_item_open_in_browser">Deschide în browser</string>
+    <string name="fallback_menu_item_share_link">Trimite linkul</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+</resources>

@@ -1,7 +1,8 @@
 # 项目记忆
 
 - 项目名称为 `huangguoAndroid`，按原始 APK 的实际版本维护，目录格式为 `hg<versionName>/`。
-- 当前版本为 `hg1.2.0`（versionCode 120）；`original/` 保存该版本原始 APK，`project/` 保存该版本独立可构建、可运行的反编译工程。
+- 最新本地工程为 `hg1.4.0`（versionCode 140），保留已发布的 `hg1.2.0`；`original/` 保存该版本原始 APK，`project/` 保存该版本独立可构建、可运行的反编译工程。
+- 维护或验证 1.4.0 时，先阅读 `hg1.4.0/project/README.md`；按其中步骤构建并运行完整性验证，生成的 `verification/` 仅保留本地。
 - Android Studio 应打开对应版本的 `project/` 目录，Gradle 命令也在该目录执行。新增版本时创建新的版本目录，不覆盖旧版本。
 
 - 本项目是“黄果 APP”反编译后的产物。

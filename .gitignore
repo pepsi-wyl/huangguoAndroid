@@ -25,3 +25,6 @@ __pycache__/
 *.p12
 *.pfx
 *.key
+
+# Local APK verification reports and screenshots
+**/project/verification/

@@ -1,6 +1,6 @@
 # huangguoAndroid
 
-按黄果 APP 原始 APK 的版本维护，每个版本包含原始 APK 和独立可构建、可运行的反编译工程。当前版本为 `1.2.0`（versionCode `120`）。
+按黄果 APP 原始 APK 的版本维护，每个版本包含原始 APK 和独立可构建、可运行的反编译工程。最新版本工程为 `1.4.0`（versionCode `140`），保留 `1.2.0`。
 
 本仓库用于授权范围内的学习研究、兼容性分析和调试，不是黄果 APP 的原始开发源码仓库，不应被视为官方发布渠道。
 
@@ -8,7 +8,8 @@
 
 ```text
 huangguoAndroid/
-├── hg1.2.0/
+├── hg1.2.0/                      # 已发布版本，核心结构同下
+├── hg1.4.0/                      # 最新版本工程
 │   ├── original/                 # 原始 APK
 │   └── project/                  # Android Studio 打开此目录
 │       ├── app/                  # 重打包和调试工程
@@ -16,6 +17,8 @@ huangguoAndroid/
 │       ├── reference/            # Java 参考源码及资源
 │       ├── tools/                # 重打包工具
 │       ├── gradle/
+│       ├── README.md             # 本版本构建、反编译与验证说明
+│       ├── provenance.json       # 原始 APK 与工具信息
 │       └── gradlew
 ├── AGENTS.md
 └── README.md
@@ -23,31 +26,37 @@ huangguoAndroid/
 
 新增版本时创建 `hg<versionName>/original/` 和 `hg<versionName>/project/`，例如 `hg1.3.0/`，保留旧版本。版本号以 APK 的实际 `versionName` 为准。
 
+## 1.4.0 工程
+
+Android Studio 打开 `hg1.4.0/project/`，运行 `./gradlew assembleDebug`。调试包名为 `com.njggc.yjusza.debug`，产物为 `hg1.4.0/project/app/build/outputs/apk/debug/hgdj-debug.apk`。详细说明见 [1.4.0 工程 README](hg1.4.0/project/README.md)。此版本已完成本地构建、模拟器安装和启动验证。发布附件见 [1.4.0 Release](https://github.com/pepsi-wyl/huangguoAndroid/releases/tag/hg1.4.0)。
+
+以下下载、构建与发布示例使用 1.4.0；旧版继续保留。
+
 ## 下载与发布
 
-在 GitHub 仓库的 **Releases** 中选择对应版本，分别下载 `huangguo-1.2.0-original.apk` 和 `huangguo-1.2.0-project.zip`。工程包解压后打开 `hg1.2.0/project/`；GitHub 自动附带的 `Source code (zip)` 包含整个仓库，并非单版本工程包。
+在 GitHub 仓库的 **Releases** 中选择对应版本，分别下载 `huangguo-1.4.0-original.apk` 和 `huangguo-1.4.0-project.zip`。工程包解压后打开 `hg1.4.0/project/`；GitHub 自动附带的 `Source code (zip)` 包含整个仓库，并非单版本工程包。
 
 每次发布包含原始 APK、单版本工程 ZIP 和 `SHA256SUMS.txt`。工程包附带本 README，只从指定 Git 提交读取文件，不包含未提交文件、其他版本及本地构建缓存。此自动化负责打包，不执行 Android 构建或设备运行验证；发版前请先按下文验证构建。
 
 维护者在提交当前版本后，可使用 Python 3.9+ 和 Git 本地预览打包：
 
 ```bash
-python3 scripts/package_release.py hg1.2.0 --ref HEAD
+python3 scripts/package_release.py hg1.4.0 --ref HEAD
 ```
 
-输出到 `dist/hg1.2.0/`，不会覆盖已有输出。再次预览可使用 `--output /tmp/huangguo-preview-2` 指定新目录。正式按标签重现打包时省略 `--ref HEAD`，脚本会读取同名标签。
+输出到 `dist/hg1.4.0/`，不会覆盖已有输出。再次预览可使用 `--output /tmp/huangguo-preview-2` 指定新目录。正式按标签重现打包时省略 `--ref HEAD`，脚本会读取同名标签。
 
 配置 GitHub 远程仓库后，提交并推送代码，再推送发布标签：
 
 ```bash
 git push origin HEAD
-git tag -a hg1.2.0 -m '黄果 Android 1.2.0'
-git push origin hg1.2.0
+git tag -a hg1.4.0 -m '黄果 Android 1.4.0'
+git push origin hg1.4.0
 ```
 
 推送 `hg*` 标签会触发 `.github/workflows/release.yml`，自动上传附件并创建 **Release 草稿**，检查附件后在 GitHub 点击发布，用户才能下载。工作流使用 GitHub 自带的 `GITHUB_TOKEN`，无需配置个人令牌；仓库策略须允许该工作流写入 Releases。若同名 Release 已存在，流程会失败而不会覆盖它；部分失败留下的草稿需先检查并补齐，或删除该草稿后重新运行失败的工作流。
 
-标签必须为 `hg<三段版本号>` 或 `hg<三段版本号>-r<正整数>`。例如 `hg1.2.0-r2` 从 `hg1.2.0/` 打包，表示 APK 版本不变、工程修订发布；附件名称相应带 `1.2.0-r2`。每个版本的 `original/` 必须恰好有一个已提交的 APK，且标签版本须与工程 `apktool.yml` 中的版本一致。新 APK 版本新增目录，不移动旧发布标签。
+标签必须为 `hg<三段版本号>` 或 `hg<三段版本号>-r<正整数>`。例如 `hg1.4.0-r2` 从 `hg1.4.0/` 打包，表示 APK 版本不变、工程修订发布；附件名称相应带 `1.4.0-r2`。每个版本的 `original/` 必须恰好有一个已提交的 APK，且标签版本须与工程 `apktool.yml` 中的版本一致。新 APK 版本新增目录，不移动旧发布标签。
 
 下载全部附件后，可校验文件完整性：
 
@@ -58,14 +67,14 @@ shasum -a 256 -c SHA256SUMS.txt  # macOS
 
 ## 构建
 
-Android Studio 打开 `hg1.2.0/project/`，配置 JDK 17 或兼容版本、Android SDK Platform 34 和 Build Tools 36.0.0。由 IDE 生成本地 `local.properties`，或自行设置 `sdk.dir`。在仓库根目录执行：
+Android Studio 打开 `hg1.4.0/project/`，配置 JDK 17 或兼容版本、Android SDK Platform 34 和 Build Tools 36.0.0。由 IDE 生成本地 `local.properties`，或自行设置 `sdk.dir`。在仓库根目录执行：
 
 ```bash
-cd hg1.2.0/project
+cd hg1.4.0/project
 ./gradlew assembleDebug
 ```
 
-重打包产物位于 `project/app/build/outputs/apk/debug/hgdj-debug.apk`（相对于版本目录）。也可在 Android Studio 中选择 `app` 运行到设备。调试包使用独立包名 `tv.ewtcs.dfynfj.debug`。
+重打包产物位于 `project/app/build/outputs/apk/debug/hgdj-debug.apk`（相对于版本目录）。也可在 Android Studio 中选择 `app` 运行到设备。调试包使用独立包名 `com.njggc.yjusza.debug`。
 
 ## 调试签名
 
@@ -73,7 +82,7 @@ cd hg1.2.0/project
 
 | 项目 | 值 |
 | --- | --- |
-| 本地生成位置 | `hg1.2.0/project/.generated/debug-signing/debug.keystore` |
+| 本地生成位置 | `hg1.4.0/project/.generated/debug-signing/debug.keystore` |
 | 密钥库格式 | `PKCS12` |
 | 密钥库密码（storePassword） | `android` |
 | 密钥别名（keyAlias） | `androiddebugkey` |
@@ -88,7 +97,7 @@ cd hg1.2.0/project
 
 ```bash
 keytool -list -v \
-  -keystore hg1.2.0/project/.generated/debug-signing/debug.keystore \
+  -keystore hg1.4.0/project/.generated/debug-signing/debug.keystore \
   -alias androiddebugkey \
   -storepass android
 ```

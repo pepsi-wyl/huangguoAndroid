@@ -36,7 +36,7 @@ def package(tag, ref, output):
         if f"{folder}/project/{required}" not in paths:
             raise ValueError(f"缺少工程文件：{required}")
     # Even accidentally committed machine-specific/build files must not be distributed.
-    forbidden = {"build", ".gradle", ".idea", ".run", ".git", ".cxx", ".externalNativeBuild", "local.properties", ".DS_Store", "captures", ".generated"}
+    forbidden = {"build", ".gradle", ".idea", ".run", ".git", ".cxx", ".externalNativeBuild", "local.properties", ".DS_Store", "captures", ".generated", "verification"}
     for path in paths:
         if path.lower().endswith((".keystore", ".jks", ".p12", ".pfx", ".key")):
             raise ValueError(f"版本目录含有不应发布的密钥文件：{path}")

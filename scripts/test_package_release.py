@@ -88,6 +88,13 @@ class PackageReleaseTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "密钥"):
             package_release.package("hg1.2.0", "HEAD", self.root / "dist")
 
+    def test_committed_verification_report_rejected(self):
+        (self.project / "verification").mkdir()
+        (self.project / "verification/integrity.json").write_text("{}")
+        self.commit()
+        with self.assertRaisesRegex(ValueError, "不应发布"):
+            package_release.package("hg1.2.0", "HEAD", self.root / "dist")
+
     def test_generated_directory_rejected(self):
         (self.project / ".generated").mkdir()
         (self.project / ".generated/private.txt").write_text("test fixture")

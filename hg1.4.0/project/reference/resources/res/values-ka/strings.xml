@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="call_notification_answer_action">პასუხი</string>
+    <string name="call_notification_answer_video_action">ვიდეო</string>
+    <string name="call_notification_decline_action">უარყოფა</string>
+    <string name="call_notification_hang_up_action">გათიშვა</string>
+    <string name="call_notification_incoming_text">შემომავალი ზარი</string>
+    <string name="call_notification_ongoing_text">მიმდინარე ზარი</string>
+    <string name="call_notification_screening_text">შემომავალი ზარების გაცხრილვა</string>
+    <string name="copy_toast_msg">გაცვლის ბუფერში კოპირებული ბმული</string>
+    <string name="exo_download_completed">ჩამოტვირთვა დასრულდა</string>
+    <string name="exo_download_description">ჩამოტვირთვა</string>
+    <string name="exo_download_downloading">მიმდინარეობს ჩამოტვირთვა</string>
+    <string name="exo_download_failed">ჩამოტვირთვა ვერ მოხერხდა</string>
+    <string name="exo_download_notification_channel_name">ჩამოტვირთვები</string>
+    <string name="exo_download_paused">ჩამოტვირთვები დაპაუზებულია</string>
+    <string name="exo_download_paused_for_network">ჩამოტვირთვები ქსელს ელოდება</string>
+    <string name="exo_download_paused_for_wifi">ჩამოტვირთვები Wi-Fi-ს ელოდება</string>
+    <string name="exo_download_removing">მიმდინარეობს ჩამოტვირთვების ამოშლა</string>
+    <string name="fallback_menu_item_copy_link">ბმულის კოპირება</string>
+    <string name="fallback_menu_item_open_in_browser">ბრაუზერში გახსნა</string>
+    <string name="fallback_menu_item_share_link">ბმულის გაზიარება</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+</resources>

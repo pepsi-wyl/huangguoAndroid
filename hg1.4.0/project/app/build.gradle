@@ -1,0 +1,196 @@
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.artifact.ArtifactTransformationRequest
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
+
+plugins { id 'com.android.application' }
+
+abstract class GenerateDebugKeystore extends DefaultTask {
+    @OutputFile abstract RegularFileProperty getKeyStore()
+    @Inject abstract ExecOperations getExecOperations()
+
+    @TaskAction void generate() {
+        File output = keyStore.get().asFile
+        // Preserve the signing identity even when Gradle history is cleared.
+        if (output.isFile()) return
+        output.parentFile.mkdirs()
+        boolean windows = System.getProperty('os.name').toLowerCase().contains('windows')
+        File keytool = new File(System.getProperty('java.home'), windows ? 'bin/keytool.exe' : 'bin/keytool')
+        execOperations.exec {
+            commandLine keytool, '-genkeypair', '-noprompt',
+                '-keystore', output, '-storetype', 'PKCS12', '-storepass', 'android',
+                '-alias', 'androiddebugkey', '-keypass', 'android',
+                '-keyalg', 'RSA', '-keysize', '2048', '-sigalg', 'SHA256withRSA',
+                '-validity', '10000', '-dname', 'CN=APK Debug, O=Local Development, C=CN'
+        }
+    }
+}
+
+def generatedDebugKeystore = rootProject.layout.projectDirectory.file('.generated/debug-signing/debug.keystore')
+def generateDebugKeystore = tasks.register('generateDebugKeystore', GenerateDebugKeystore) {
+    keyStore.set(generatedDebugKeystore)
+    outputs.doNotCacheIf('Private signing keys must stay local') { true }
+}
+
+android {
+    namespace 'com.njggc.yjusza.debug'
+    compileSdk 34
+    buildToolsVersion '36.0.0'
+    defaultConfig {
+        applicationId 'com.njggc.yjusza.debug'
+        minSdk 21
+        targetSdk 31
+        versionCode 140
+        versionName '1.4.0'
+    }
+    signingConfigs {
+        debug {
+            storeFile generatedDebugKeystore.asFile
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    buildTypes { debug { debuggable true } }
+}
+
+// AGP APK 转换接口确保 Android Studio 部署重打包后的应用。
+abstract class RebuildApk extends DefaultTask {
+    @InputDirectory @PathSensitive(PathSensitivity.RELATIVE)
+    abstract DirectoryProperty getInputApks()
+    @OutputDirectory abstract DirectoryProperty getOutputApks()
+    @InputDirectory @PathSensitive(PathSensitivity.RELATIVE)
+    abstract DirectoryProperty getDecodedProject()
+    @InputDirectory @PathSensitive(PathSensitivity.RELATIVE)
+    abstract DirectoryProperty getToolsDirectory()
+    @InputFile @PathSensitive(PathSensitivity.NONE)
+    abstract RegularFileProperty getSigningKey()
+    @Internal abstract DirectoryProperty getSdkDirectory()
+    @Internal abstract Property<ArtifactTransformationRequest<RebuildApk>> getTransformationRequest()
+    @Inject abstract ExecOperations getExecOperations()
+    @Inject abstract FileSystemOperations getFileSystemOperations()
+    // Assign namespace-aware XML attributes so existing values are replaced safely.
+    static void prepareManifest(File manifest) {
+        def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        factory.setNamespaceAware(true)
+        def document = factory.newDocumentBuilder().parse(manifest)
+        String androidNs = 'http://schemas.android.com/apk/res/android'
+        String originalPackage = 'com.njggc.yjusza'
+        String debugPackage = originalPackage + '.debug'
+        def elements = document.getElementsByTagName('*')
+        for (int i = 0; i < elements.length; i++) {
+            def element = elements.item(i)
+            def attributes = element.attributes
+            for (int j = 0; j < attributes.length; j++) {
+                def attribute = attributes.item(j)
+                String value = attribute.nodeValue
+                if (value == originalPackage ||
+                    (value.startsWith(originalPackage + '.') &&
+                     value != debugPackage && !value.startsWith(debugPackage + '.'))) {
+                    attribute.nodeValue = debugPackage + value.substring(originalPackage.length())
+                }
+            }
+            if (element.getAttributeNS(androidNs, 'label') == '黄果短剧') {
+                element.setAttributeNS(androidNs, 'android:label', '黄果短剧 Debug')
+            }
+        }
+        def application = document.getElementsByTagName('application').item(0)
+        if (application == null) throw new GradleException('Manifest missing application')
+        application.setAttributeNS(androidNs, 'android:debuggable', 'true')
+        application.setAttributeNS(androidNs, 'android:extractNativeLibs', 'true')
+        def transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer()
+        transformer.setOutputProperty(javax.xml.transform.OutputKeys.ENCODING, 'UTF-8')
+        transformer.transform(new javax.xml.transform.dom.DOMSource(document),
+            new javax.xml.transform.stream.StreamResult(manifest))
+    }
+
+    @TaskAction void rebuild() {
+        File decoded = new File(temporaryDir, 'decoded')
+        fileSystemOperations.delete { delete decoded }
+        fileSystemOperations.copy {
+            from decodedProject
+            into decoded
+            exclude 'build/**', 'dist/**', 'original/**', '**/.DS_Store'
+        }
+        File manifest = new File(decoded, 'AndroidManifest.xml')
+        prepareManifest(manifest)
+        File tooling = toolsDirectory.get().asFile
+        File framework = new File(temporaryDir, 'framework')
+        fileSystemOperations.copy { from new File(tooling, 'framework'); into framework }
+        boolean windows = System.getProperty('os.name').toLowerCase().contains('windows')
+        String javaBin = new File(System.getProperty('java.home'), windows ? 'bin/java.exe' : 'bin/java').absolutePath
+        File buildTools = new File(sdkDirectory.get().asFile, 'build-tools/36.0.0')
+        File unsigned = new File(temporaryDir, 'unsigned.apk')
+        File aligned = new File(temporaryDir, 'aligned.apk')
+        File output = outputApks.get().asFile
+        output.mkdirs()
+        File signed = new File(output, 'hgdj-debug.apk')
+        execOperations.exec {
+            commandLine javaBin, '-jar', new File(tooling, 'apktool.jar'), 'b', '-f', '-p', framework, decoded, '-o', unsigned
+        }
+        execOperations.exec {
+            commandLine new File(buildTools, windows ? 'zipalign.exe' : 'zipalign'), '-f', '-P', '16', '4', unsigned, aligned
+        }
+        execOperations.exec {
+            commandLine javaBin, '-jar', new File(buildTools, 'lib/apksigner.jar'), 'sign',
+                '--ks', signingKey.get().asFile, '--ks-pass', 'pass:android',
+                '--key-pass', 'pass:android', '--out', signed, aligned
+        }
+        execOperations.exec {
+            commandLine javaBin, '-jar', new File(buildTools, 'lib/apksigner.jar'), 'verify', signed
+        }
+        transformationRequest.get().submit(this) { artifact -> signed }
+    }
+}
+androidComponents {
+    beforeVariants(selector().all()) { builder ->
+        if (builder.buildType != 'debug') builder.enable = false
+    }
+    onVariants(selector().withBuildType('debug')) { variant ->
+        def repack = tasks.register('rebuildDebugApk', RebuildApk) {
+            dependsOn generateDebugKeystore
+            decodedProject.set(rootProject.layout.projectDirectory.dir('apktool'))
+            toolsDirectory.set(rootProject.layout.projectDirectory.dir('tools'))
+            signingKey.set(generatedDebugKeystore)
+            sdkDirectory.set(androidComponents.sdkComponents.sdkDirectory)
+            outputApks.set(layout.buildDirectory.dir('outputs/apk/repacked/debug'))
+        }
+        def request = variant.artifacts.use(repack)
+            .wiredWithDirectories({ it.inputApks }, { it.outputApks })
+            .toTransformMany(SingleArtifact.APK.INSTANCE)
+        repack.configure { transformationRequest.set(request) }
+    }
+}
+
+tasks.configureEach {
+    if (name == 'validateSigningDebug') dependsOn generateDebugKeystore
+}
+
+// Regression: existing debug attributes and repeated transforms must remain valid XML.
+tasks.register('verifyManifestTransform') {
+    doLast {
+        String androidNs = 'http://schemas.android.com/apk/res/android'
+        [null, 'false', 'true'].eachWithIndex { value, index ->
+            File fixture = new File(temporaryDir, "manifest-${index}.xml")
+            fixture.parentFile.mkdirs()
+            String attribute = value == null ? '' : "android:debuggable=\"${value}\""
+            fixture.setText("""<manifest xmlns:android="${androidNs}" package="com.njggc.yjusza">
+                <application ${attribute} android:extractNativeLibs="false" android:label="黄果短剧">
+                    <activity android:name="com.org.aksm.MainActivity" />
+                    <provider android:name="androidx.core.content.FileProvider" android:authorities="com.njggc.yjusza.fileProvider" />
+                </application></manifest>""", 'UTF-8')
+            2.times { RebuildApk.prepareManifest(fixture) }
+            def factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+            factory.setNamespaceAware(true)
+            def doc = factory.newDocumentBuilder().parse(fixture)
+            assert doc.documentElement.getAttribute('package') == 'com.njggc.yjusza.debug'
+            def application = doc.getElementsByTagName('application').item(0)
+            assert application.getAttributeNS(androidNs, 'debuggable') == 'true'
+            assert application.getAttributeNS(androidNs, 'extractNativeLibs') == 'true'
+            assert application.getAttributeNS(androidNs, 'label') == '黄果短剧 Debug'
+            assert doc.getElementsByTagName('provider').item(0).getAttributeNS(androidNs, 'authorities') == 'com.njggc.yjusza.debug.fileProvider'
+            assert doc.getElementsByTagName('activity').item(0).getAttributeNS(androidNs, 'name') == 'com.org.aksm.MainActivity'
+        }
+    }
+}
+tasks.named('check') { dependsOn 'verifyManifestTransform' }
